@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anam Khan — Portfolio</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── HERO ── */
+    .hero {
+      min-height: calc(100vh - 56px);
+      display: flex;
+      align-items: center;
+      padding: 4rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 80% 50%, rgba(29,158,117,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 20% 20%, rgba(55,138,221,0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 3rem;
+      align-items: center;
+      width: 100%;
+    }
+    .hero-tag {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--teal);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .hero-tag::before {
+      content: '';
+      width: 30px; height: 1px;
+      background: var(--teal);
+    }
+    .hero h1 {
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 0.4rem;
+      color: var(--text);
+    }
+    .hero h1 .accent { color: var(--teal); }
+    .hero-role {
+      font-size: 1.05rem;
+      color: var(--teal-lt);
+      font-weight: 600;
+      margin-bottom: 1.2rem;
+      font-family: var(--font-mono);
+    }
+    .hero p {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.75;
+      max-width: 480px;
+      margin-bottom: 2rem;
+      font-weight: 400;
+    }
+    .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    /* avatar */
+    .avatar-wrap {
+      position: relative;
+      flex-shrink: 0;
+    }
+    .avatar {
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      border: 3px solid var(--teal);
+      background: var(--navy3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.2rem;
+      font-weight: 800;
+      color: var(--teal);
+      font-family: var(--font-mono);
+      position: relative;
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-10px); }
+    }
+    .avatar-ring {
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 1px dashed rgba(29,158,117,0.4);
+      animation: spin 12s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .avatar-dot {
+      position: absolute;
+      top: 8px; right: 8px;
+      width: 14px; height: 14px;
+      background: var(--teal);
+      border-radius: 50%;
+      border: 2px solid var(--navy);
+    }
+
+    /* ── SKILLS ── */
+    .skills-section { padding: 4rem 2rem; background: var(--navy2); }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+    .section-title {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 2rem;
+    }
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+    .skill-card {
+      background: var(--navy3);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .skill-card:hover { border-color: var(--teal); transform: translateY(-3px); }
+    .skill-icon {
+      width: 36px; height: 36px;
+      border-radius: var(--radius);
+      margin-bottom: 0.75rem;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+    }
+    .skill-card h3 { font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 0.25rem; }
+    .skill-card p  { font-size: 0.78rem; color: var(--muted); margin-bottom: 0.75rem; line-height: 1.5; }
+    .skill-bar-bg  { height: 4px; background: var(--border2); border-radius: 2px; }
+    .skill-bar-fill {
+      height: 4px; border-radius: 2px;
+      background: var(--teal);
+      width: 0;
+      transition: width 1.2s ease;
+    }
+    .skill-pct { font-family: var(--font-mono); font-size: 0.7rem; color: var(--teal); margin-top: 0.3rem; text-align: right; }
+
+    /* ── PROJECTS ── */
+    .projects-section { padding: 4rem 2rem; }
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.25rem;
+    }
+    .proj-card {
+      background: var(--navy2);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      transition: border-color 0.2s, transform 0.2s;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .proj-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+    }
+    .proj-card.teal::before  { background: var(--teal); }
+    .proj-card.blue::before  { background: var(--blue); }
+    .proj-card.purple::before{ background: var(--purple); }
+    .proj-card:hover { transform: translateY(-4px); }
+    .proj-card:hover.teal  { border-color: var(--teal); }
+    .proj-card:hover.blue  { border-color: var(--blue); }
+    .proj-card:hover.purple{ border-color: var(--purple); }
+    .proj-tag {
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+    .proj-tag.teal  { color: var(--teal); }
+    .proj-tag.blue  { color: var(--blue); }
+    .proj-tag.purple{ color: var(--purple); }
+    .proj-card h3 { font-size: 1.05rem; font-weight: 700; color: var(--text); }
+    .proj-card p  { font-size: 0.82rem; color: var(--muted); line-height: 1.65; flex: 1; }
+    .proj-link {
+      font-size: 0.78rem;
+      font-family: var(--font-mono);
+      color: var(--teal);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: gap 0.2s;
+    }
+    .proj-link:hover { gap: 8px; }
+
+    /* ── ABOUT / CONTACT ── */
+    .about-section {
+      padding: 4rem 2rem;
+      background: var(--navy2);
+    }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+      align-items: start;
+    }
+    .about-grid h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 1rem; }
+    .about-grid p  { font-size: 0.88rem; color: var(--muted); line-height: 1.8; }
+    .contact-list  { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem; }
+    .contact-list li {
+      display: flex; align-items: center; gap: 0.75rem;
+      font-size: 0.85rem; color: var(--muted);
+      font-family: var(--font-mono);
+    }
+    .contact-list .ci {
+      width: 32px; height: 32px;
+      border-radius: var(--radius);
+      background: rgba(29,158,117,0.1);
+      border: 1px solid rgba(29,158,117,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .hero-grid { grid-template-columns: 1fr; text-align: center; }
+      .hero-tag { justify-content: center; }
+      .hero p { margin-left: auto; margin-right: auto; }
+      .hero-btns { justify-content: center; }
+      .avatar-wrap { margin: 0 auto; }
+      .about-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .hero { padding: 2.5rem 1.25rem; }
+      .skills-section, .projects-section, .about-section { padding: 2.5rem 1.25rem; }
+      .avatar { width: 120px; height: 120px; font-size: 2.4rem; }
+    }
+
+    /* fade-in animation */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="nav-logo">{'</>'} <span>Dev</span>Studio</a>
+  <div class="nav-links">
+    <a href="index.html"   class="nav-link active">Portfolio</a>
+    <a href="quiz.html"    class="nav-link">Quiz</a>
+    <a href="weather.html" class="nav-link">Weather</a>
+  </div>
+  <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html"   class="active">Portfolio</a>
+  <a href="quiz.html">Quiz</a>
+  <a href="weather.html">Weather</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid">
+    <div class="hero-content fade-up">
+      <div class="hero-tag">Welcome to my portfolio</div>
+      <h1>Hi, I'm <span class="accent">Anam Khan</span></h1>
+      <div class="hero-role">Full-Stack Web Developer</div>
+      <p>Crafting responsive, interactive web experiences with modern CSS & JavaScript. Passionate about clean code, great UX, and building things that work beautifully on every device.</p>
+      <div class="hero-btns">
+        <a href="#projects" class="btn btn-primary">View Projects →</a>
+        <a href="#about"    class="btn btn-outline">Get In Touch</a>
+      </div>
+    </div>
+    <div class="avatar-wrap fade-up" style="transition-delay:0.2s;">
+      <div class="avatar-ring"></div>
+      <div class="avatar">
+        AK
+        <div class="avatar-dot"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section class="skills-section">
+  <div class="section-inner">
+    <div class="section-label fade-up">What I do</div>
+    <h2 class="section-title fade-up">Skills & Expertise</h2>
+    <div class="skills-grid">
+
+      <div class="skill-card fade-up" data-pct="90">
+        <div class="skill-icon" style="background:rgba(29,158,117,0.12);">🎨</div>
+        <h3>CSS & Responsive Design</h3>
+        <p>Flexbox, CSS Grid, media queries for mobile, tablet & desktop breakpoints. Animations, transitions & custom properties.</p>
+        <div class="skill-bar-bg"><div class="skill-bar-fill" style="background:var(--teal);"></div></div>
+        <div class="skill-pct">90%</div>
+      </div>
+
+      <div class="skill-card fade-up" data-pct="85" style="transition-delay:0.1s;">
+        <div class="skill-icon" style="background:rgba(55,138,221,0.12);">⚡</div>
+        <h3>JavaScript (ES6+)</h3>
+        <p>DOM manipulation, Fetch API, async/await, event-driven programming, localStorage & real-time data display.</p>
+        <div class="skill-bar-bg"><div class="skill-bar-fill" style="background:var(--blue);"></div></div>
+        <div class="skill-pct">85%</div>
+      </div>
+
+      <div class="skill-card fade-up" data-pct="78" style="transition-delay:0.2s;">
+        <div class="skill-icon" style="background:rgba(83,74,183,0.12);">🔗</div>
+        <h3>APIs & Async JS</h3>
+        <p>Fetching live data from REST APIs, handling JSON, error states, loading indicators & dynamic UI updates.</p>
+        <div class="skill-bar-bg"><div class="skill-bar-fill" style="background:var(--purple);"></div></div>
+        <div class="skill-pct">78%</div>
+      </div>
+
+      <div class="skill-card fade-up" data-pct="80" style="transition-delay:0.3s;">
+        <div class="skill-icon" style="background:rgba(239,159,39,0.12);">📐</div>
+        <h3>HTML5 & Accessibility</h3>
+        <p>Semantic markup, ARIA labels, keyboard navigation, form validation & progressive enhancement.</p>
+        <div class="skill-bar-bg"><div class="skill-bar-fill" style="background:var(--amber);"></div></div>
+        <div class="skill-pct">80%</div>
+      </div>
+
+      <div class="skill-card fade-up" data-pct="72" style="transition-delay:0.4s;">
+        <div class="skill-icon" style="background:rgba(29,158,117,0.12);">🛠</div>
+        <h3>Dev Tools & Workflow</h3>
+        <p>Git, VS Code, browser DevTools, performance profiling, responsive testing across real devices.</p>
+        <div class="skill-bar-bg"><div class="skill-bar-fill" style="background:var(--teal);"></div></div>
+        <div class="skill-pct">72%</div>
+      </div>
+
+      <div class="skill-card fade-up" data-pct="68" style="transition-delay:0.5s;">
+        <div class="skill-icon" style="background:rgba(83,74,183,0.12);">🎯</div>
+        <h3>UI / UX Design</h3>
+        <p>Figma wireframing, user-centred design thinking, colour theory, typography & creating delightful interfaces.</p>
+        <div class="skill-bar-bg"><div class="skill-bar-fill" style="background:var(--purple);"></div></div>
+        <div class="skill-pct">68%</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section class="projects-section" id="projects">
+  <div class="section-inner">
+    <div class="section-label fade-up">What I've built</div>
+    <h2 class="section-title fade-up">Projects</h2>
+    <div class="projects-grid">
+
+      <div class="proj-card teal fade-up">
+        <div class="proj-tag teal">Quiz App</div>
+        <h3>JS Knowledge Quiz</h3>
+        <p>A fully interactive quiz with both text-based questions and image carousel rounds. Features real-time scoring, animated feedback, progress tracking and a final results screen.</p>
+        <a href="quiz.html" class="proj-link">Open Quiz →</a>
+      </div>
+
+      <div class="proj-card blue fade-up" style="transition-delay:0.1s;">
+        <div class="proj-tag blue">API App</div>
+        <h3>WeatherScope</h3>
+        <p>Live weather data fetched from the OpenWeatherMap API. City search, geolocation, current conditions, 5-day forecast and Air Quality Index — all updating in real time.</p>
+        <a href="weather.html" class="proj-link">Open Weather →</a>
+      </div>
+
+      <div class="proj-card purple fade-up" style="transition-delay:0.2s;">
+        <div class="proj-tag purple">Portfolio</div>
+        <h3>This Portfolio</h3>
+        <p>A responsive multi-page site built with vanilla HTML, CSS and JavaScript. Demonstrates advanced media queries, smooth animations and clean component architecture.</p>
+        <a href="#" class="proj-link">You're here →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT & CONTACT -->
+<section class="about-section" id="about">
+  <div class="section-inner">
+    <div class="about-grid">
+      <div class="fade-up">
+        <div class="section-label">About me</div>
+        <h2 class="section-title" style="margin-bottom:1rem;">Anam Khan</h2>
+        <p>I'm a full-stack web developer with a passion for building interfaces that are not just functional but genuinely delightful to use. I specialise in responsive design, clean JavaScript, and fetching real-time data from APIs.</p>
+        <br/>
+        <p style="color:var(--muted);">When I'm not coding, I'm exploring new design trends, experimenting with CSS animations, or finding creative ways to solve UX problems.</p>
+      </div>
+      <div class="fade-up" style="transition-delay:0.15s;">
+        <div class="section-label">Get in touch</div>
+        <h2 class="section-title" style="margin-bottom:1rem;">Contact</h2>
+        <ul class="contact-list">
+          <li><span class="ci">📧</span>anam@devstudio.dev</li>
+          <li><span class="ci">🐙</span>github.com/anamkhan</li>
+          <li><span class="ci">💼</span>linkedin.com/in/anamkhan</li>
+          <li><span class="ci">📍</span>Mumbai, Maharashtra, India</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 Anam Khan</span>
+  <span>Built with HTML · CSS · JavaScript</span>
+</footer>
+
+<script>
+  // hamburger
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  hamburger.addEventListener('click', () => {
+    mobileMenu.classList.toggle('open');
+  });
+
+  // scroll fade-in
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        // animate skill bars
+        const bar = e.target.querySelector('.skill-bar-fill');
+        if (bar) {
+          const pct = e.target.dataset.pct || '0';
+          setTimeout(() => bar.style.width = pct + '%', 100);
+        }
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // also trigger hero immediately
+  document.querySelectorAll('.hero .fade-up').forEach(el => {
+    setTimeout(() => el.classList.add('visible'), 100);
+  });
+</script>
+</body>
+</html>

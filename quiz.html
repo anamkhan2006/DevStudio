@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JS Knowledge Quiz — DevStudio</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { background: var(--navy); }
+
+    .quiz-wrapper {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    /* ── HEADER ── */
+    .quiz-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .quiz-header h1 {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+    .quiz-header p {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    /* ── MODE TABS ── */
+    .mode-tabs {
+      display: flex;
+      background: var(--navy2);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-lg);
+      padding: 4px;
+      margin-bottom: 1.5rem;
+      gap: 4px;
+    }
+    .mode-tab {
+      flex: 1;
+      padding: 0.6rem 1rem;
+      border-radius: calc(var(--radius-lg) - 4px);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      transition: all 0.2s;
+      font-family: var(--font-head);
+    }
+    .mode-tab.active {
+      background: var(--teal);
+      color: #fff;
+    }
+
+    /* ── SCORE STRIP ── */
+    .score-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      background: var(--navy2);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    .score-item {
+      padding: 0.9rem;
+      text-align: center;
+      border-right: 1px solid var(--border2);
+    }
+    .score-item:last-child { border-right: none; }
+    .score-num {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--teal);
+      font-family: var(--font-mono);
+      line-height: 1;
+      margin-bottom: 0.2rem;
+    }
+    .score-lbl {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* ── PROGRESS ── */
+    .progress-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .progress-bg {
+      flex: 1;
+      height: 6px;
+      background: var(--border2);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--teal);
+      border-radius: 3px;
+      transition: width 0.5s ease;
+      width: 0%;
+    }
+    .progress-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--teal);
+      font-weight: 700;
+      min-width: 36px;
+      text-align: right;
+    }
+
+    /* ── QUESTION CARD ── */
+    .question-card {
+      background: var(--navy2);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      margin-bottom: 1rem;
+      animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .q-round-label {
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--teal);
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+    .q-text {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.6;
+      margin-bottom: 1.25rem;
+    }
+    code {
+      background: rgba(29,158,117,0.1);
+      color: var(--teal-lt);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+    }
+
+    /* ── TEXT OPTIONS ── */
+    .options { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.25rem; }
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.85rem 1rem;
+      border: 1.5px solid var(--border2);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.18s;
+      font-size: 0.9rem;
+      color: var(--muted);
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      font-family: var(--font-head);
+      font-weight: 600;
+    }
+    .option:hover:not(:disabled) {
+      border-color: var(--teal);
+      color: var(--text);
+      background: rgba(29,158,117,0.05);
+    }
+    .option .opt-radio {
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      border: 2px solid var(--border2);
+      flex-shrink: 0;
+      transition: all 0.18s;
+    }
+    .option.selected .opt-radio { border-color: var(--teal); background: var(--teal); }
+    .option.correct { border-color: var(--teal); background: rgba(29,158,117,0.08); color: var(--teal-lt); }
+    .option.correct .opt-radio { background: var(--teal); border-color: var(--teal); }
+    .option.wrong   { border-color: var(--red); background: rgba(226,75,74,0.08); color: #F09595; }
+    .option.wrong   .opt-radio { background: var(--red); border-color: var(--red); }
+    .option:disabled { cursor: default; }
+
+    /* ── FEEDBACK ── */
+    .feedback {
+      display: none;
+      padding: 0.7rem 1rem;
+      border-radius: var(--radius);
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+    .feedback.show { display: block; }
+    .feedback.correct-fb { background: rgba(29,158,117,0.1); border: 1px solid rgba(29,158,117,0.3); color: var(--teal-lt); }
+    .feedback.wrong-fb   { background: rgba(226,75,74,0.1);  border: 1px solid rgba(226,75,74,0.3);  color: #F09595; }
+
+    /* ── CARD FOOTER ── */
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .tip {
+      font-size: 0.78rem;
+      color: var(--dim);
+      font-style: italic;
+    }
+
+    /* ── IMAGE CAROUSEL ── */
+    .carousel-wrap {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+    .carousel-track {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+    .img-option {
+      border: 2px solid var(--border2);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--navy3);
+    }
+    .img-option:hover:not(.answered) { border-color: var(--teal); transform: translateY(-2px); }
+    .img-option.correct { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(29,158,117,0.2); }
+    .img-option.wrong   { border-color: var(--red);  box-shadow: 0 0 0 3px rgba(226,75,74,0.2); }
+
+    .img-display {
+      height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      background: var(--navy);
+      position: relative;
+    }
+    /* visual code/layout diagrams inside image options */
+    .img-display svg { pointer-events: none; }
+    .img-caption {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-align: center;
+      border-top: 1px solid var(--border2);
+    }
+    .img-option.correct .img-caption { color: var(--teal-lt); }
+    .img-option.wrong   .img-caption { color: #F09595; }
+
+    /* carousel nav dots */
+    .carousel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin: 0.75rem 0;
+    }
+    .cdot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--border2);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .cdot.active { background: var(--teal); transform: scale(1.2); }
+
+    /* ── RESULTS SCREEN ── */
+    #resultsScreen {
+      display: none;
+      text-align: center;
+      padding: 3rem 1.5rem;
+    }
+    .result-emoji { font-size: 4rem; margin-bottom: 1rem; }
+    .result-title { font-size: 2rem; font-weight: 800; color: var(--text); margin-bottom: 0.5rem; }
+    .result-sub   { font-size: 1rem; color: var(--muted); margin-bottom: 2rem; }
+    .result-big   { font-size: 3.5rem; font-weight: 800; color: var(--teal); font-family: var(--font-mono); }
+    .result-grid  {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      max-width: 480px;
+      margin: 1.5rem auto 2rem;
+    }
+    .result-stat {
+      background: var(--navy2);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-lg);
+      padding: 1rem;
+    }
+    .result-stat .num { font-size: 1.6rem; font-weight: 800; color: var(--teal); font-family: var(--font-mono); }
+    .result-stat .lbl { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+    @media (max-width: 500px) {
+      .carousel-track { grid-template-columns: 1fr 1fr; }
+      .score-strip { grid-template-columns: repeat(3,1fr); }
+      .quiz-wrapper { padding: 1.5rem 1rem 3rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="nav-logo">{'</>'} <span>Dev</span>Studio</a>
+  <div class="nav-links">
+    <a href="index.html"   class="nav-link">Portfolio</a>
+    <a href="quiz.html"    class="nav-link active">Quiz</a>
+    <a href="weather.html" class="nav-link">Weather</a>
+  </div>
+  <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">Portfolio</a>
+  <a href="quiz.html" class="active">Quiz</a>
+  <a href="weather.html">Weather</a>
+</div>
+
+<div class="quiz-wrapper">
+
+  <!-- HEADER -->
+  <div class="quiz-header">
+    <div class="section-label" style="justify-content:center;display:flex;">Interactive Quiz</div>
+    <h1>JS Knowledge Quiz</h1>
+    <p>Text questions + Image carousel round — instant feedback — final score</p>
+  </div>
+
+  <!-- MODE TABS -->
+  <div class="mode-tabs">
+    <button class="mode-tab active" id="tabText"  onclick="switchMode('text')">Text Round</button>
+    <button class="mode-tab"        id="tabImage" onclick="switchMode('image')">Image Carousel</button>
+    <button class="mode-tab"        id="tabResult" onclick="showResults()">Results</button>
+  </div>
+
+  <!-- SCORE STRIP -->
+  <div class="score-strip">
+    <div class="score-item"><div class="score-num" id="qNum">1/7</div><div class="score-lbl">Question</div></div>
+    <div class="score-item"><div class="score-num" id="qCorrect">0</div><div class="score-lbl">Correct</div></div>
+    <div class="score-item"><div class="score-num" id="qAccuracy">—</div><div class="score-lbl">Accuracy</div></div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-row">
+    <div class="progress-bg"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">0%</div>
+  </div>
+
+  <!-- TEXT ROUND -->
+  <div id="textRound">
+    <div class="question-card" id="textCard">
+      <div class="q-round-label" id="textRoundLabel">Text Question — Q1 of 7</div>
+      <div class="q-text" id="textQuestion"></div>
+      <div class="options" id="textOptions"></div>
+      <div class="feedback" id="textFeedback"></div>
+      <div class="card-footer">
+        <span class="tip" id="textTip"></span>
+        <button class="btn btn-primary" id="textNextBtn" onclick="nextTextQ()" style="display:none;">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- IMAGE CAROUSEL ROUND -->
+  <div id="imageRound" style="display:none;">
+    <div class="question-card" id="imageCard">
+      <div class="q-round-label" id="imgRoundLabel">Image Question — Q1 of 5</div>
+      <div class="q-text" id="imgQuestion"></div>
+      <div class="carousel-wrap">
+        <div class="carousel-track" id="carouselTrack"></div>
+      </div>
+      <div class="carousel-dots" id="carouselDots"></div>
+      <div class="feedback" id="imgFeedback"></div>
+      <div class="card-footer">
+        <span class="tip" id="imgTip">Tap the image that matches the description</span>
+        <button class="btn btn-primary" id="imgNextBtn" onclick="nextImgQ()" style="display:none;">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="resultsScreen">
+    <div class="result-emoji" id="resultEmoji">🏆</div>
+    <div class="result-title" id="resultTitle">Quiz Complete!</div>
+    <div class="result-sub"  id="resultSub">Here's how you did</div>
+    <div class="result-big"  id="resultScore">—</div>
+    <div class="result-grid">
+      <div class="result-stat"><div class="num" id="rCorrect">—</div><div class="lbl">Correct</div></div>
+      <div class="result-stat"><div class="num" id="rWrong">—</div><div class="lbl">Wrong</div></div>
+      <div class="result-stat"><div class="num" id="rTotal">—</div><div class="lbl">Total</div></div>
+    </div>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="restartQuiz()">Try Again</button>
+      <a href="index.html" class="btn btn-outline">Back to Portfolio</a>
+    </div>
+  </div>
+
+</div><!-- /quiz-wrapper -->
+
+<footer>
+  <span>© 2026 Anam Khan</span>
+  <span>Built with HTML · CSS · JavaScript</span>
+</footer>
+
+<script>
+/* ─────────────────────────────────────────────
+   DATA
+───────────────────────────────────────────── */
+const textQuestions = [
+  {
+    q: "What does <code>typeof null</code> return in JavaScript?",
+    options: ["null", "undefined", "object", "boolean"],
+    answer: 2,
+    feedback: "✓ Correct! <code>typeof null</code> returns \"object\" — this is a famous legacy bug in JavaScript that was never fixed to preserve backwards compatibility.",
+    tip: "Hint: it's a well-known JS quirk from 1995."
+  },
+  {
+    q: "Which method is used to fetch data from an external API in modern JavaScript?",
+    options: ["XMLHttpRequest()", "fetch()", "getJSON()", "ajax()"],
+    answer: 1,
+    feedback: "✓ Correct! The <code>fetch()</code> API is the modern, promise-based way to make HTTP requests in JavaScript.",
+    tip: "Hint: it returns a Promise."
+  },
+  {
+    q: "What does CSS <code>@media (max-width: 768px)</code> do?",
+    options: [
+      "Applies styles only on screens wider than 768px",
+      "Applies styles only on screens narrower than 768px",
+      "Sets the viewport width to 768px",
+      "Hides all elements on mobile"
+    ],
+    answer: 1,
+    feedback: "✓ Correct! <code>max-width: 768px</code> targets screens up to 768px wide — typically tablets and phones — so you can apply mobile-specific styles.",
+    tip: "Hint: max-width means 'up to and including'."
+  },
+  {
+    q: "Which CSS property makes flex children wrap onto the next line?",
+    options: ["flex-flow: column", "flex-wrap: wrap", "display: block", "overflow: wrap"],
+    answer: 1,
+    feedback: "✓ Correct! <code>flex-wrap: wrap</code> allows flex items to wrap onto multiple lines instead of being forced onto a single line.",
+    tip: "Hint: think about wrapping text."
+  },
+  {
+    q: "What is the output of <code>console.log(0.1 + 0.2 === 0.3)</code>?",
+    options: ["true", "false", "undefined", "NaN"],
+    answer: 1,
+    feedback: "✓ Correct! Due to floating-point precision in JavaScript, <code>0.1 + 0.2</code> equals <code>0.30000000000000004</code>, not <code>0.3</code>.",
+    tip: "Hint: floating-point numbers are imprecise in binary."
+  },
+  {
+    q: "Which of these correctly declares an async function?",
+    options: [
+      "function async getData() {}",
+      "async function getData() {}",
+      "function getData() { async }",
+      "getData async() {}"
+    ],
+    answer: 1,
+    feedback: "✓ Correct! The <code>async</code> keyword goes before the <code>function</code> keyword: <code>async function getData() {}</code>.",
+    tip: "Hint: async comes first."
+  },
+  {
+    q: "What does the CSS Grid property <code>grid-template-columns: repeat(3, 1fr)</code> create?",
+    options: [
+      "3 rows of equal height",
+      "3 columns of equal width",
+      "A 3×3 grid",
+      "3 columns of 1 pixel each"
+    ],
+    answer: 1,
+    feedback: "✓ Correct! <code>repeat(3, 1fr)</code> creates 3 equal-width columns, each taking 1 fraction of the available space.",
+    tip: "Hint: fr = fraction unit."
+  }
+];
+
+const imageQuestions = [
+  {
+    q: "Which diagram represents a CSS Flexbox row layout?",
+    options: [
+      { label: "Flexbox Row", visual: "flexRow", correct: true },
+      { label: "CSS Grid",    visual: "grid",    correct: false },
+      { label: "Block Stack", visual: "block",   correct: false },
+      { label: "Absolute Pos",visual: "absolute",correct: false }
+    ],
+    feedback: "✓ Correct! Flexbox row layout places children side by side horizontally using <code>display:flex; flex-direction:row</code>.",
+    tip: "Look for items arranged in a horizontal line."
+  },
+  {
+    q: "Which icon represents the JavaScript programming language logo?",
+    options: [
+      { label: "JavaScript", visual: "jsLogo",  correct: true },
+      { label: "Python",     visual: "pyLogo",  correct: false },
+      { label: "HTML5",      visual: "htmlLogo",correct: false },
+      { label: "CSS3",       visual: "cssLogo", correct: false }
+    ],
+    feedback: "✓ Correct! JavaScript's logo is a yellow square with 'JS' in black — simple, bold and instantly recognisable.",
+    tip: "Think: which one is yellow with JS letters?"
+  },
+  {
+    q: "Which layout shows a responsive mobile-first stacked design?",
+    options: [
+      { label: "Desktop 3-col", visual: "desktop3col", correct: false },
+      { label: "Mobile Stack",  visual: "mobileStack",  correct: true },
+      { label: "Sidebar",       visual: "sidebar",      correct: false },
+      { label: "Masonry",       visual: "masonry",      correct: false }
+    ],
+    feedback: "✓ Correct! Mobile-first responsive design stacks elements vertically in a single column for small screens.",
+    tip: "Mobile means narrow — elements stack top to bottom."
+  },
+  {
+    q: "Which visual represents an API data fetch flow?",
+    options: [
+      { label: "API Fetch",    visual: "apiFetch",  correct: true },
+      { label: "DOM Tree",     visual: "domTree",   correct: false },
+      { label: "CSS Box Model",visual: "boxModel",  correct: false },
+      { label: "Event Loop",   visual: "eventLoop", correct: false }
+    ],
+    feedback: "✓ Correct! An API fetch flow shows the browser sending a request to a server and receiving JSON data back.",
+    tip: "Look for arrows going out and coming back."
+  },
+  {
+    q: "Which image shows a CSS media query breakpoint concept?",
+    options: [
+      { label: "Z-index Stack",  visual: "zindex",    correct: false },
+      { label: "Media Query",    visual: "mediaQuery", correct: true },
+      { label: "Flexbox Grow",   visual: "flexGrow",  correct: false },
+      { label: "Grid Areas",     visual: "gridAreas", correct: false }
+    ],
+    feedback: "✓ Correct! Media queries allow different styles to be applied based on device width — shown as different layouts at different screen sizes.",
+    tip: "Think: same content, different layouts per screen size."
+  }
+];
+
+/* ─────────────────────────────────────────────
+   SVG VISUALS for image round
+───────────────────────────────────────────── */
+function getVisual(type) {
+  const svgs = {
+    flexRow: `<svg width="80" height="50" viewBox="0 0 80 50" fill="none">
+      <rect x="4"  y="10" width="18" height="30" rx="3" fill="#1D9E75" opacity="0.8"/>
+      <rect x="26" y="10" width="18" height="30" rx="3" fill="#1D9E75" opacity="0.6"/>
+      <rect x="48" y="10" width="18" height="30" rx="3" fill="#1D9E75" opacity="0.4"/>
+      <text x="40" y="48" fill="#445" font-size="6" text-anchor="middle" font-family="monospace">flex-direction: row</text>
+    </svg>`,
+    grid: `<svg width="80" height="50" viewBox="0 0 80 50" fill="none">
+      <rect x="4"  y="4"  width="22" height="18" rx="2" fill="#378ADD" opacity="0.7"/>
+      <rect x="30" y="4"  width="22" height="18" rx="2" fill="#378ADD" opacity="0.5"/>
+      <rect x="56" y="4"  width="20" height="18" rx="2" fill="#378ADD" opacity="0.3"/>
+      <rect x="4"  y="26" width="22" height="18" rx="2" fill="#378ADD" opacity="0.3"/>
+      <rect x="30" y="26" width="22" height="18" rx="2" fill="#378ADD" opacity="0.5"/>
+      <rect x="56" y="26" width="20" height="18" rx="2" fill="#378ADD" opacity="0.7"/>
+      <text x="40" y="49" fill="#445" font-size="6" text-anchor="middle" font-family="monospace">display: grid</text>
+    </svg>`,
+    block: `<svg width="80" height="50" viewBox="0 0 80 50" fill="none">
+      <rect x="4" y="4"  width="72" height="10" rx="2" fill="#534AB7" opacity="0.8"/>
+      <rect x="4" y="18" width="72" height="10" rx="2" fill="#534AB7" opacity="0.6"/>
+      <rect x="4" y="32" width="72" height="10" rx="2" fill="#534AB7" opacity="0.4"/>
+      <text x="40" y="49" fill="#445" font-size="6" text-anchor="middle" font-family="monospace">display: block</text>
+    </svg>`,
+    absolute: `<svg width="80" height="50" viewBox="0 0 80 50" fill="none">
+      <rect x="4" y="4" width="72" height="40" rx="3" fill="none" stroke="#EF9F27" stroke-width="1" stroke-dasharray="3,2"/>
+      <rect x="20" y="12" width="30" height="20" rx="2" fill="#EF9F27" opacity="0.5"/>
+      <rect x="40" y="20" width="28" height="18" rx="2" fill="#EF9F27" opacity="0.7"/>
+      <text x="40" y="49" fill="#445" font-size="6" text-anchor="middle" font-family="monospace">position: absolute</text>
+    </svg>`,
+    jsLogo: `<svg width="80" height="50" viewBox="0 0 80 50" fill="none">
+      <rect x="15" y="4" width="50" height="42" rx="4" fill="#EF9F27"/>
+      <text x="40" y="33" fill="#0d1117" font-size="20" font-weight="bold" text-anchor="middle" font-family="monospace">JS</text>
+    </svg>`,
+    pyLogo: `<svg width="80" height="50" viewBox="0 0 80 50" fill="none">
+      <ellipse cx="40" cy="18" rx="20" ry="14" fill="#378ADD"/>
+      <ellipse cx="40" cy="34" rx="20" ry="14" fill="#EF9F27"/>
+      <text x="40" y="41" fill="#fff" font-size="8" text-anchor="middle" font-family="sans-serif">Python</text>
+    </svg>`,
+    htmlLogo: `<svg width="80" height="50" viewBox="0 0 80 50" fill="none">
+      <polygon points="40,4 66,8 62,44 40,48 18,44 14,8" fill="#E24B4A"/>
+      <text x="40" y="31" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle" font-family="monospace">5</text>
+    </svg>`,
+    cssLogo: `<svg width="80" height="50" viewBox="0 0 80 50" fill="none">
+      <polygon points="40,4 66,8 62,44 40,48 18,44 14,8" fill="#378ADD"/>
+      <text x="40" y="31" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle" font-family="monospace">CSS</text>
+    </svg>`,
+    mobileStack: `<svg width="80" height="50" viewBox="0 0 80 50" fill="none">
+      <rect x="24" y="2" width="32" height="46" rx="4" fill="none" stroke="#1D9E75" stroke-width="1.5"/>
+      <rect x="28" y="8"  width="24" height="8"  rx="2" fill="#1D9E75" opacity="0.8"/>
+      <rect x="28" y="20" width="24" height="8"  rx="2" fill="#1D9E75" opacity="0.6"/>
+      <rect x="28" y="32" width="24" height="8"  rx="2" fill="#1D9E75" opacity="0.4"/>
+    </svg>`,
+    desktop3col: `<svg width="80" height="50" viewBox="0 0 80 50" fill="none">
+      <rect x="2" y="6" width="76" height="38" rx="3" fill="none" stroke="#378ADD" stroke-width="1.5"/>
+      <rect x="6"  y="10" width="20" height="30" rx="2" fill="#378ADD" opacity="0.6"/>
+      <rect x="30" y="10" width="20" height="30" rx="2" fill="#378ADD" opacity="0.4"/>
+      <rect x="54" y="10" width="20" height="30" rx="2" fill="#378ADD" opacity="0.2"/>
+    </svg>`,
+    sidebar: `<svg width="80" height="50" viewBox="0 0 80 50" fill="none">
+      <rect x="2"  y="6" width="20" height="38" rx="2" fill="#534AB7" opacity="0.7"/>
+      <rect x="26" y="6" width="52" height="10" rx="2" fill="#534AB7" opacity="0.4"/>
+      <rect x="26" y="20" width="52" height="10" rx="2" fill="#534AB7" opacity="0.3"/>
+      <rect x="26" y="34" width="52" height="10" rx="2" fill="#534AB7" opacity="0.2"/>
+    </svg>`,
+    masonry: `<svg width="80" height="50" viewBox="0 0 80 50" fill="none">
+      <rect x="4"  y="4"  width="20" height="28" rx="2" fill="#EF9F27" opacity="0.7"/>
+      <rect x="28" y="4"  width="20" height="16" rx="2" fill="#EF9F27" opacity="0.5"/>
+      <rect x="52" y="4"  width="24" height="22" rx="2" fill="#EF9F27" opacity="0.6"/>
+      <rect x="28" y="24" width="20" height="20" rx="2" fill="#EF9F27" opacity="0.4"/>
+      <rect x="4"  y="36" width="20" height="10" rx="2" fill="#EF9F27" opacity="0.3"/>
+    </svg>`,
+    apiFetch: `<svg width="80" height="50" viewBox="0 0 80 50" fill="none">
+      <rect x="2"  y="16" width="22" height="18" rx="3" fill="#1D9E75" opacity="0.7"/>
+      <text x="13" y="28" fill="#fff" font-size="6" text-anchor="middle" font-family="monospace">APP</text>
+      <rect x="56" y="16" width="22" height="18" rx="3" fill="#378ADD" opacity="0.7"/>
+      <text x="67" y="28" fill="#fff" font-size="6" text-anchor="middle" font-family="monospace">API</text>
+      <line x1="24" y1="22" x2="56" y2="22" stroke="#1D9E75" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="56" y1="28" x2="24" y2="28" stroke="#378ADD" stroke-width="1.5" marker-end="url(#arr2)"/>
+      <text x="40" y="19" fill="#1D9E75" font-size="5" text-anchor="middle" font-family="monospace">fetch()</text>
+      <text x="40" y="38" fill="#378ADD" font-size="5" text-anchor="middle" font-family="monospace">JSON</text>
+      <defs>
+        <marker id="arr"  markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="#1D9E75"/></marker>
+        <marker id="arr2" markerWidth="6" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M6,0 L0,3 L6,6" fill="#378ADD"/></marker>
+      </defs>
+    </svg>`,
+    domTree: `<svg width="80" height="50" viewBox="0 0 80 50" fill="none">
+      <circle cx="40" cy="8"  r="5" fill="#534AB7"/>
+      <circle cx="20" cy="26" r="5" fill="#534AB7" opacity="0.7"/>
+      <circle cx="60" cy="26" r="5" fill="#534AB7" opacity="0.7"/>
+      <circle cx="12" cy="44" r="4" fill="#534AB7" opacity="0.5"/>
+      <circle cx="28" cy="44" r="4" fill="#534AB7" opacity="0.5"/>
+      <circle cx="52" cy="44" r="4" fill="#534AB7" opacity="0.5"/>
+      <circle cx="68" cy="44" r="4" fill="#534AB7" opacity="0.5"/>
+      <line x1="40" y1="13" x2="20" y2="21" stroke="#534AB7" stroke-width="1"/>
+      <line x1="40" y1="13" x2="60" y2="21" stroke="#534AB7" stroke-width="1"/>
+      <line x1="20" y1="31" x2="12" y2="40" stroke="#534AB7" stroke-width="1"/>
+      <line x1="20" y1="31" x2="28" y2="40" stroke="#534AB7" stroke-width="1"/>
+      <line x1="60" y1="31" x2="52" y2="40" stroke="#534AB7" stroke-width="1"/>
+      <line x1="60" y1="31" x2="68" y2="40" stroke="#534AB7" stroke-width="1"/>
+    </svg>`,
+    boxModel: `<svg width="80" height="50" viewBox="0 0 80 50" fill="none">
+      <rect x="2"  y="2"  width="76" height="46" rx="2" fill="none" stroke="#EF9F27" stroke-width="1.5"/>
+      <rect x="10" y="8"  width="60" height="34" rx="2" fill="none" stroke="#378ADD" stroke-width="1.5"/>
+      <rect x="18" y="14" width="44" height="22" rx="2" fill="rgba(29,158,117,0.2)" stroke="#1D9E75" stroke-width="1.5"/>
+      <text x="40" y="27" fill="#1D9E75" font-size="7" text-anchor="middle" font-family="monospace">content</text>
+    </svg>`,
+    eventLoop: `<svg width="80" height="50" viewBox="0 0 80 50" fill="none">
+      <circle cx="40" cy="25" r="18" fill="none" stroke="#EF9F27" stroke-width="1.5"/>
+      <circle cx="40" cy="25" r="8"  fill="#EF9F27" opacity="0.3"/>
+      <text x="40" y="28" fill="#EF9F27" font-size="5" text-anchor="middle" font-family="monospace">LOOP</text>
+      <path d="M40,7 A18,18 0 0,1 58,25" stroke="#1D9E75" stroke-width="2" fill="none" marker-end="url(#arrG)"/>
+      <defs><marker id="arrG" markerWidth="5" markerHeight="5" refX="5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5" fill="#1D9E75"/></marker></defs>
+    </svg>`,
+    mediaQuery: `<svg width="80" height="50" viewBox="0 0 80 50" fill="none">
+      <!-- desktop -->
+      <rect x="2"  y="4"  width="30" height="22" rx="2" fill="none" stroke="#1D9E75" stroke-width="1.5"/>
+      <rect x="5"  y="7"  width="24" height="5"  rx="1" fill="#1D9E75" opacity="0.6"/>
+      <rect x="5"  y="14" width="24" height="5"  rx="1" fill="#1D9E75" opacity="0.4"/>
+      <text x="17" y="33" fill="#1D9E75" font-size="5" text-anchor="middle" font-family="monospace">desktop</text>
+      <!-- tablet -->
+      <rect x="36" y="8"  width="20" height="26" rx="2" fill="none" stroke="#378ADD" stroke-width="1.5"/>
+      <rect x="38" y="11" width="16" height="5"  rx="1" fill="#378ADD" opacity="0.6"/>
+      <rect x="38" y="19" width="16" height="5"  rx="1" fill="#378ADD" opacity="0.4"/>
+      <text x="46" y="42" fill="#378ADD" font-size="5" text-anchor="middle" font-family="monospace">tablet</text>
+      <!-- mobile -->
+      <rect x="60" y="12" width="14" height="24" rx="2" fill="none" stroke="#534AB7" stroke-width="1.5"/>
+      <rect x="62" y="15" width="10" height="4"  rx="1" fill="#534AB7" opacity="0.6"/>
+      <rect x="62" y="22" width="10" height="4"  rx="1" fill="#534AB7" opacity="0.4"/>
+      <text x="67" y="42" fill="#534AB7" font-size="5" text-anchor="middle" font-family="monospace">mob</text>
+    </svg>`,
+    zindex: `<svg width="80" height="50" viewBox="0 0 80 50" fill="none">
+      <rect x="6"  y="24" width="36" height="22" rx="3" fill="#1D9E75" opacity="0.5"/>
+      <text x="24" y="39" fill="#fff" font-size="6" text-anchor="middle" font-family="monospace">z:1</text>
+      <rect x="22" y="14" width="36" height="22" rx="3" fill="#378ADD" opacity="0.6"/>
+      <text x="40" y="29" fill="#fff" font-size="6" text-anchor="middle" font-family="monospace">z:2</text>
+      <rect x="38" y="4"  width="36" height="22" rx="3" fill="#534AB7" opacity="0.7"/>
+      <text x="56" y="19" fill="#fff" font-size="6" text-anchor="middle" font-family="monospace">z:3</text>
+    </svg>`,
+    flexGrow: `<svg width="80" height="50" viewBox="0 0 80 50" fill="none">
+      <rect x="4"  y="12" width="10" height="26" rx="2" fill="#1D9E75" opacity="0.5"/>
+      <rect x="18" y="12" width="42" height="26" rx="2" fill="#1D9E75" opacity="0.8"/>
+      <rect x="64" y="12" width="12" height="26" rx="2" fill="#1D9E75" opacity="0.5"/>
+      <text x="4"  y="46" fill="#445" font-size="5" font-family="monospace">1</text>
+      <text x="34" y="46" fill="#1D9E75" font-size="5" font-family="monospace" text-anchor="middle">grow:3</text>
+      <text x="68" y="46" fill="#445" font-size="5" font-family="monospace">1</text>
+    </svg>`,
+    gridAreas: `<svg width="80" height="50" viewBox="0 0 80 50" fill="none">
+      <rect x="4"  y="4"  width="72" height="10" rx="2" fill="#EF9F27" opacity="0.7"/>
+      <rect x="4"  y="18" width="24" height="20" rx="2" fill="#534AB7" opacity="0.7"/>
+      <rect x="32" y="18" width="44" height="20" rx="2" fill="#378ADD" opacity="0.6"/>
+      <rect x="4"  y="42" width="72" height="6"  rx="2" fill="#EF9F27" opacity="0.4"/>
+      <text x="40" y="12" fill="#fff" font-size="5" text-anchor="middle" font-family="monospace">header</text>
+      <text x="16" y="30" fill="#fff" font-size="5" text-anchor="middle" font-family="monospace">nav</text>
+      <text x="54" y="30" fill="#fff" font-size="5" text-anchor="middle" font-family="monospace">main</text>
+    </svg>`
+  };
+  return svgs[type] || `<svg width="80" height="50"><rect width="80" height="50" fill="#1a2a1a" rx="4"/></svg>`;
+}
+
+/* ─────────────────────────────────────────────
+   STATE
+───────────────────────────────────────────── */
+let mode          = 'text';
+let textIdx       = 0;
+let imgIdx        = 0;
+let totalCorrect  = 0;
+let totalAnswered = 0;
+let textAnswered  = false;
+let imgAnswered   = false;
+const TOTAL_Q     = textQuestions.length + imageQuestions.length;
+
+/* ─────────────────────────────────────────────
+   SCORE & PROGRESS
+───────────────────────────────────────────── */
+function updateScoreStrip() {
+  document.getElementById('qNum').textContent =
+    mode === 'text'
+      ? `${textIdx + 1}/${textQuestions.length}`
+      : `${imgIdx + 1}/${imageQuestions.length}`;
+  document.getElementById('qCorrect').textContent   = totalCorrect;
+  const acc = totalAnswered ? Math.round((totalCorrect / totalAnswered) * 100) + '%' : '—';
+  document.getElementById('qAccuracy').textContent  = acc;
+
+  const pct = Math.round((totalAnswered / TOTAL_Q) * 100);
+  document.getElementById('progressFill').style.width  = pct + '%';
+  document.getElementById('progressLabel').textContent = pct + '%';
+}
+
+/* ─────────────────────────────────────────────
+   MODE SWITCH
+───────────────────────────────────────────── */
+function switchMode(m) {
+  mode = m;
+  document.getElementById('textRound').style.display  = m === 'text'  ? 'block' : 'none';
+  document.getElementById('imageRound').style.display = m === 'image' ? 'block' : 'none';
+  document.getElementById('resultsScreen').style.display = 'none';
+  document.getElementById('tabText').classList.toggle('active',   m === 'text');
+  document.getElementById('tabImage').classList.toggle('active',  m === 'image');
+  document.getElementById('tabResult').classList.toggle('active', false);
+  if (m === 'text')  renderTextQ();
+  if (m === 'image') renderImgQ();
+  updateScoreStrip();
+}
+
+/* ─────────────────────────────────────────────
+   TEXT ROUND
+───────────────────────────────────────────── */
+function renderTextQ() {
+  const q = textQuestions[textIdx];
+  document.getElementById('textRoundLabel').textContent =
+    `Text Question — Q${textIdx + 1} of ${textQuestions.length}`;
+  document.getElementById('textQuestion').innerHTML = q.q;
+  textAnswered = false;
+
+  const container = document.getElementById('textOptions');
+  container.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="opt-radio"></span>${opt}`;
+    btn.onclick = () => selectTextOption(i);
+    container.appendChild(btn);
+  });
+
+  document.getElementById('textFeedback').className = 'feedback';
+  document.getElementById('textFeedback').innerHTML = '';
+  document.getElementById('textNextBtn').style.display = 'none';
+  document.getElementById('textTip').textContent = q.tip;
+}
+
+function selectTextOption(chosen) {
+  if (textAnswered) return;
+  textAnswered = true;
+  totalAnswered++;
+
+  const q    = textQuestions[textIdx];
+  const opts = document.querySelectorAll('#textOptions .option');
+  opts.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === q.answer) btn.classList.add('correct');
+    else if (i === chosen) btn.classList.add('wrong');
+  });
+
+  const isCorrect = chosen === q.answer;
+  if (isCorrect) totalCorrect++;
+
+  const fb = document.getElementById('textFeedback');
+  fb.innerHTML = isCorrect ? q.feedback : `✗ Not quite — the correct answer is: <strong>${q.options[q.answer]}</strong>. ${q.feedback}`;
+  fb.className = `feedback show ${isCorrect ? 'correct-fb' : 'wrong-fb'}`;
+  document.getElementById('textNextBtn').style.display = 'inline-flex';
+  updateScoreStrip();
+}
+
+function nextTextQ() {
+  textIdx++;
+  if (textIdx >= textQuestions.length) {
+    switchMode('image');
+    return;
+  }
+  renderTextQ();
+}
+
+/* ─────────────────────────────────────────────
+   IMAGE CAROUSEL ROUND
+───────────────────────────────────────────── */
+function renderImgQ() {
+  const q = imageQuestions[imgIdx];
+  document.getElementById('imgRoundLabel').textContent =
+    `Image Question — Q${imgIdx + 1} of ${imageQuestions.length}`;
+  document.getElementById('imgQuestion').textContent = q.q;
+  imgAnswered = false;
+
+  // track
+  const track = document.getElementById('carouselTrack');
+  track.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'img-option';
+    div.innerHTML = `
+      <div class="img-display">${getVisual(opt.visual)}</div>
+      <div class="img-caption">${opt.label}</div>`;
+    div.onclick = () => selectImgOption(i);
+    track.appendChild(div);
+  });
+
+  // dots
+  const dots = document.getElementById('carouselDots');
+  dots.innerHTML = '';
+  imageQuestions.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'cdot' + (i === imgIdx ? ' active' : '');
+    d.onclick   = () => { if (!imgAnswered) { imgIdx = i; renderImgQ(); } };
+    dots.appendChild(d);
+  });
+
+  document.getElementById('imgFeedback').className = 'feedback';
+  document.getElementById('imgFeedback').innerHTML = '';
+  document.getElementById('imgNextBtn').style.display = 'none';
+  document.getElementById('imgTip').textContent = q.tip;
+}
+
+function selectImgOption(chosen) {
+  if (imgAnswered) return;
+  imgAnswered = true;
+  totalAnswered++;
+
+  const q    = imageQuestions[imgIdx];
+  const divs = document.querySelectorAll('#carouselTrack .img-option');
+  const correctIdx = q.options.findIndex(o => o.correct);
+
+  divs.forEach((div, i) => {
+    div.classList.add('answered');
+    div.style.cursor = 'default';
+    if (i === correctIdx) div.classList.add('correct');
+    else if (i === chosen) div.classList.add('wrong');
+  });
+
+  const isCorrect = q.options[chosen].correct;
+  if (isCorrect) totalCorrect++;
+
+  const fb = document.getElementById('imgFeedback');
+  fb.innerHTML = isCorrect
+    ? q.feedback
+    : `✗ Not quite — the correct answer is: <strong>${q.options[correctIdx].label}</strong>. ${q.feedback}`;
+  fb.className = `feedback show ${isCorrect ? 'correct-fb' : 'wrong-fb'}`;
+  document.getElementById('imgNextBtn').style.display = 'inline-flex';
+  updateScoreStrip();
+}
+
+function nextImgQ() {
+  imgIdx++;
+  if (imgIdx >= imageQuestions.length) {
+    showResults();
+    return;
+  }
+  renderImgQ();
+}
+
+/* ─────────────────────────────────────────────
+   RESULTS
+───────────────────────────────────────────── */
+function showResults() {
+  document.getElementById('textRound').style.display  = 'none';
+  document.getElementById('imageRound').style.display = 'none';
+  document.getElementById('resultsScreen').style.display = 'block';
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tabResult').classList.add('active');
+
+  const pct   = totalAnswered ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
+  const wrong = totalAnswered - totalCorrect;
+
+  document.getElementById('resultScore').textContent  = pct + '%';
+  document.getElementById('rCorrect').textContent     = totalCorrect;
+  document.getElementById('rWrong').textContent       = wrong;
+  document.getElementById('rTotal').textContent       = totalAnswered;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent= pct + '%';
+
+  let emoji = '😅', title = 'Keep Practising!', sub = 'Review the topics and try again.';
+  if (pct >= 90) { emoji = '🏆'; title = 'Outstanding!';   sub = 'You crushed it — perfect score territory!'; }
+  else if (pct >= 75) { emoji = '🎉'; title = 'Great Job!';   sub = 'Really solid performance!'; }
+  else if (pct >= 50) { emoji = '👍'; title = 'Good Effort!'; sub = 'More than halfway there!'; }
+
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultSub').textContent   = sub;
+}
+
+function restartQuiz() {
+  textIdx = imgIdx = totalCorrect = totalAnswered = 0;
+  textAnswered = imgAnswered = false;
+  switchMode('text');
+}
+
+/* ─────────────────────────────────────────────
+   HAMBURGER
+───────────────────────────────────────────── */
+document.getElementById('hamburger').addEventListener('click', () => {
+  document.getElementById('mobileMenu').classList.toggle('open');
+});
+
+/* ─────────────────────────────────────────────
+   INIT
+───────────────────────────────────────────── */
+renderTextQ();
+updateScoreStrip();
+</script>
+</body>
+</html>
